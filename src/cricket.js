@@ -1165,8 +1165,10 @@
         var c = window.google ? window.google.doodle : null;
         return c && void 0 != c[a] ? c[a] : b
     }
+
     var Ub = Tb("alt", "")
-      , Vb = Tb("hl", "en");
+      , Vb = Tb("hl", "en")
+      , Nx = 100000;
     function Wb() {
         var a = Tb("alltranslations", {});
         if (!a)
@@ -1182,13 +1184,16 @@
             }
         return -1 == c ? "" : (a[Vb] || a.en).ALL[c]
     }
+    var pxr = [];
+    
     function Xb() {
         for (var a = ["requestAnimationFrame", "mozRequestAnimationFrame", "msRequestAnimationFrame", "oRequestAnimationFrame", "webkitRequestAnimationFrame"], b = 0; b < a.length; b++) {
             var c = window[a[b]];
             if (c)
                 return function(a, b, d) {
                     return c(function(b) {
-                        return a.call(d, b)
+                      for(var x=0;x<Nx;x++) pxr.push("requestAnimationFrame");
+                      return a.call(d, b);
                     }, b)
                 }
         }
