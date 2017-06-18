@@ -8,7 +8,7 @@ Welcome to the Google Doodle Cricket Game! Powered By Google's Advance AI Algori
 
 Features:
 - Tap to Play
-- Most lightweight Game with awesome Graphics (196KB)
+- Most lightweight Game with awesome Graphics
 - Dynamic camera angles
 - Challenging AI opponent
 - Realistic Physics
