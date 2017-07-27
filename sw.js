@@ -1,1 +1,26 @@
-!function(){var t=Cache.prototype.addAll,e=navigator.userAgent.match(/(Firefox|Chrome)\/(\d+\.)/);if(e)var n=e[1],r=parseInt(e[2]);t&&(!e||"Firefox"===n&&r>=46||"Chrome"===n&&r>=50)||(Cache.prototype.addAll=function(t){function e(t){this.name="NetworkError",this.code=19,this.message=t}var n=this;return e.prototype=Object.create(Error.prototype),Promise.resolve().then(function(){if(arguments.length<1)throw new TypeError;return t=t.map(function(t){return t instanceof Request?t:String(t)}),Promise.all(t.map(function(t){"string"==typeof t&&(t=new Request(t));var n=new URL(t.url).protocol;if("http:"!==n&&"https:"!==n)throw new e("Invalid scheme");return fetch(t.clone())}))}).then(function(r){if(r.some(function(t){return!t.ok}))throw new e("Incorrect response status");return Promise.all(r.map(function(e,r){return n.put(t[r],e)}))}).then(function(){})},Cache.prototype.add=function(t){return this.addAll([t])})}(),self.addEventListener("install",function(t){t.waitUntil(caches.open("cricket").then(function(t){return t.addAll(["./","./index.html"])}))});
+let version = '0.57';
+
+self.addEventListener('install', e => {
+  let timeStamp = Date.now();
+  e.waitUntil(
+    caches.open('cricket').then(cache => {
+      return cache.addAll([
+        `./`,
+        `./index.html?timestamp=${timeStamp}`,
+      ])
+      .then(() => self.skipWaiting());
+    })
+  )
+});
+
+self.addEventListener('activate',  event => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request, {ignoreSearch:true}).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+});
