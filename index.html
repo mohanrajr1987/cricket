@@ -52,7 +52,6 @@
         var tooltip = root.querySelector('.tooltip');
 
         var install = function (e) {
-          e.preventDefault();
           window.install.prompt()
             .then(function (outcome) {
               ga('send', 'event', 'install', outcome);
