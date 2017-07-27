@@ -39,7 +39,7 @@
     </div>
   </div>
   <div id="installer">
-    <button style="border: solid 4px #b0003d; margin:100px; padding: 12px; color: #b0003d;background-color: transparent;font-size: 1em;
+    <button id="install" style="border: solid 4px #b0003d; margin:100px; padding: 12px; color: #b0003d;background-color: transparent;font-size: 1em;
     font-weight: bold;">Install</button>
     <span class="tooltip"></span>
   </div>
@@ -48,7 +48,7 @@
   <script type="text/javascript">
     (function () {
       'use strict';
-      var Installer = function (root) {
+       var Installer = function (root) {
         var tooltip = root.querySelector('.tooltip');
 
         var install = function (e) {
@@ -70,9 +70,9 @@
               ga('send', 'event', 'install', 'prompted');
             });
         };
-        root.addEventListener('click', install.bind(this));
+        document.getElementById('install').addEventListener('click', install.bind(this));
         init();
-      };
+      }; 
 
 
       (function () {
