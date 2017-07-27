@@ -38,97 +38,57 @@
       <canvas tabindex="0" style="cursor: pointer;"></canvas>
     </div>
   </div>
-  <div id="installer">
-    <button id="install" style="border: solid 4px #b0003d; margin:100px; padding: 12px; color: #b0003d;background-color: transparent;font-size: 1em;
-    font-weight: bold;">Install</button>
-    <span class="tooltip"></span>
-  </div>
   <a href='https://play.google.com/store/apps/details?id=in.asissuthar.cricket' style='position:fixed;padding:5px 45px;width:128px;top:50px;left:-50px;-webkit-transform:rotate(315deg);-moz-transform:rotate(315deg);-ms-transform:rotate(315deg);transform:rotate(315deg);box-shadow:0 0 0 3px #ab2247, 0 0 20px -3px rgba(0, 0, 0, 0.5);text-shadow:0 0 0 #ffffff, 0 0 5px rgba(0, 0, 0, 0.3);background-color:#ab2247;color:#ffffff;font-size:13px;font-family:sans-serif;text-decoration:none;font-weight:bold;border:2px dotted #ffffff;-webkit-backface-visibility:hidden;letter-spacing:.5px;'>Download</a>
   
   <script type="text/javascript">
     (function () {
-      'use strict';
-       var Installer = function (root) {
-        var tooltip = root.querySelector('.tooltip');
 
-        var install = function (e) {
-          e.preventDefault();
-          window.install.prompt()
-            .then(function (outcome) {
-              ga('send', 'event', 'install', outcome);
-              root.classList.remove('available');
-            })
-            .catch(function (installError) {
-              ga('send', 'event', 'install', 'errored');
-            });
-        };
-
-        var init = function () {
-          window.install.canPrompt()
-            .then(function () {
-              root.classList.add('available');
-              ga('send', 'event', 'install', 'prompted');
-            });
-        };
-        document.getElementById('install').addEventListener('click', install.bind(this));
-        init();
-      }; 
-
-
-      (function () {
-
-        var deferredInstall;
-        var promptTriggered = false;
-        var canPromptPromiseResolved;
-        var canPromptPromise = new Promise(function (resolve, reject) {
-          canPromptPromiseResolved = resolve;
-        });
-
-
-        window.addEventListener('beforeinstallprompt', function (e) {
-          promptTriggered = true;
-          e.preventDefault();
-          deferredInstall = e;
-          canPromptPromiseResolved();
-          return false;
-        });
-
-        var install = {};
-
-        Object.defineProperty(install, 'isAvailable', {
-          get: function () {
-            return promptTriggered;
-          }
-        });
-
-        install.canPrompt = function () {
-          return canPromptPromise;
-        };
-
-        install.prompt = function () {
-          return new Promise(function (resolve, reject) {
-            if (promptTriggered === false) {
-              // There can be a whole host or reasons, we should determine them
-              reject('User Agent decided not to prompt');
-            };
-
-            deferredInstall.prompt().then(function () {
-              return deferredInstall.userChoice
-            }).then(function (choice) {
-              resolve(choice.outcome);
-            }).catch(function (reason) {
-              reject(reason);
-            });
-          });
-        };
-
-        window.install = install;
-      })();
-
-      window.addEventListener('load', function () {
-        var installEl = document.getElementById('installer');
-        var installer = new Installer(installEl);
+      var deferredInstall;
+      var promptTriggered = false;
+      var canPromptPromiseResolved;
+      var canPromptPromise = new Promise(function (resolve, reject) {
+        canPromptPromiseResolved = resolve;
       });
+
+
+      window.addEventListener('beforeinstallprompt', function (e) {
+        promptTriggered = true;
+        e.preventDefault();
+        deferredInstall = e;
+        canPromptPromiseResolved();
+        return false;
+      });
+
+      var install = {};
+
+      Object.defineProperty(install, 'isAvailable', {
+        get: function () {
+          return promptTriggered;
+        }
+      });
+
+      install.canPrompt = function () {
+        return canPromptPromise;
+      };
+
+      install.prompt = function () {
+        return new Promise(function (resolve, reject) {
+          if (promptTriggered === false) {
+            // There can be a whole host or reasons, we should determine them
+            reject('User Agent decided not to prompt');
+          };
+
+          deferredInstall.prompt().then(function () {
+            return deferredInstall.userChoice
+          }).then(function (choice) {
+            resolve(choice.outcome);
+          }).catch(function (reason) {
+            reject(reason);
+          });
+        });
+      };
+
+      window.install = install;
     })();
 
     if('serviceWorker' in navigator) {
@@ -139,6 +99,21 @@
 
       navigator.serviceWorker.ready.then(function(registration) {
           console.log('Service Worker Ready');
+          window
+          .install
+          .canPrompt()
+          .then(function () {
+            ga('send', 'event', 'install', 'prompted');
+            window
+            .install
+            .prompt()
+            .then(function (outcome) {
+              ga('send', 'event', 'install', outcome);
+            })
+            .catch(function (installError) {
+              ga('send', 'event', 'install', 'errored');
+            });
+          });
       });
     }
     
